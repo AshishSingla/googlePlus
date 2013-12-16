@@ -1,0 +1,112 @@
+
+<% if logged_in? %>
+
+  <!-- <h1>Logged in</h1> -->
+
+  <p><%= link_to 'Sign out', signout_path %><p>
+  	
+  	<h2>Circles in Your List</h2>
+	<div align="center" class="uniq">
+		<%if flash[:notice].present?%>
+		<p style="color:green"><%=flash[:notice]%></p>
+		<%end%> 
+	</div>
+	<table border="1" align="center">
+		<tr>
+			<th>CircleName</th>
+			<th>ADD PEOPLE TO CIRCLE</th>
+			<th>REMOVE PEOPLE FROM CIRCLE</th>
+			<th>UPDATE CIRCLE</th>
+			<th>DELETE CIRCLE</th>
+		</tr>	
+		<%if !@result.nil?%>
+		<% @result.data.items.each do |circle| %>
+		<tr>
+			<td><%=circle.displayName%></td>
+			<td><a href="javascript:void(0);" onClick="popup_add_people('<%=circle.id%>')" id="add_people">add people</a></td>
+			<td><%= link_to 'remove people',:id => 'remove_people', :remote=> true %></td>
+			<td><%= link_to 'update',:id => 'update', :remote=> true %></td>
+			<td><%= link_to 'delete',:id => 'delete', :remote=> true %></td>
+		</tr>	
+		<div id="popup_add_people_to_circleId_<%=circle.id%>" class="warning_popup" style="display:none;top:75%;left:55%;width:460px;height:130px;">
+			<div class="heading">Add People To <%=circle.displayName%></div>
+			<div class="boxadnt" style="text-align: justify;">
+				<input type="textarea" name="pop_people" id="pop_people_<%=circle.id%>" />
+			</div>
+			<div align="right" style="margin-right:20px;">
+				
+			<input type="button" id="add_people_to_circle" value="Add" onclick="add_people('/home/index?circle_id=<%=circle.id%>','<%=circle.id%>');" style="height: 36px;width: 55px;font: 13px;"/>
+			<input type="button" onclick="hide_pop_up_people('<%=circle.id%>')" value="Cancel" style="height: 36px;width: 55px;font: 13px;"/>
+			</div>
+		</div>
+		<%end%>	
+		<%end%>
+	</table>
+	<br/>
+	<input type="button" onClick="create_circle()" value="Create New Circle" style="float:right; margin-right: 250px;">	
+  	<p>
+  		<ul>
+	  		<%#= debug @result.data %>
+		  	<%# @result.data.each do |activity| 
+		  	%>
+		  		<li><%=# activity 
+		  		%></li>
+		  	<% #end 
+		  	%>
+	  	</ul>
+	</p>
+<% else %>
+
+  <%= link_to 'Sign in', '/signet/google/auth' %>
+
+<% end %>
+<div id="popup_create_circle" class="warning_popup" style="display:none;top:75%;left:55%;width:460px;height:130px;">
+	<div class="heading">Create Empty Circle</div>
+	<div class="boxadnt" style="text-align: justify;">
+		"Enter Email address:"
+		<input type="textarea" name="pop_circle" id="pop_circle" />
+	</div>
+	<div align="right" style="margin-right:20px;">
+	  <input type="button" id="add_circle" value="Add" onclick="add_circle('/home/index?type=create_circle');" style="height: 36px;width: 55px;font: 13px;"/>
+	  <input type="button" id="hide_pop_up_circle" value="Cancel" style="height: 36px;width: 55px;font: 13px;"/>
+    </div>
+</div>
+
+<script type="text/javascript">
+<!--
+function create_circle() {
+	$("#popup_create_circle").show();
+}
+function popup_add_people(id){
+	$("#popup_add_people_to_circleId_"+id).show();
+}
+$("#hide_pop_up_circle").click(function(){
+		$("#popup_create_circle").hide();
+	});
+function hide_pop_up_people(id){
+		$("#popup_add_people_to_circleId_"+id).hide();
+	}
+function add_circle(tourl){
+    $.ajax({
+    url:tourl,
+    data: 'circle_name='+$('#pop_circle').val(),
+    dataType:"json", 
+    complete:function(request) {
+    	$("#popup_create_circle").hide();
+     // $('#active_panel').html(request.responseText);
+    }
+  });
+ }
+function add_people(tourl,id){
+    $.ajax({
+    url:tourl,
+    data: 'type=add_people'+'&email='+$('#pop_people_'+id).val(),
+    dataType:"json", 
+    complete:function(request) {
+    	$("#popup_add_people_to_circle_"+id).hide();
+     // $('#active_panel').html(request.responseText);
+    }
+  });
+ }
+//-->
+</script>
